@@ -1,0 +1,5 @@
+---
+
+# User ftp
+vsftpd_user: user_ftp
+vsftpd_password: password

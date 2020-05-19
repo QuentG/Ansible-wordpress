@@ -1,0 +1,24 @@
+---
+
+- name: Install Mysql
+  hosts: db
+  become: true
+  pre_tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: true
+
+  roles:
+    - mysql
+
+- name: Install apache, php, ftp and install/config wordpress
+  hosts: web
+  become: true
+  pre_tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: true
+
+  roles:
+    - apache-php-ftp
+    - wordpress

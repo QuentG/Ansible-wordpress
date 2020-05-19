@@ -1,0 +1,77 @@
+---
+
+# Apache2
+- name: Install apache2 && dependencies mysql
+  apt:
+    name: "{{ item }}" # Iteration
+    state: present
+  with_items:
+    - apache2
+    - libapache2-mod-php7.2
+    - mysql-client
+
+# Configurations apache2
+- name: Add our virtualhost conf
+  template:
+    src: vhost.conf.j2
+    dest: /etc/apache2/sites-available/{{ server_hostname }}.conf
+  notify:
+    - Restart apache2
+
+- name: a2ensite {{ server_hostname }}
+  command: a2ensite {{ server_hostname }}
+  notify:
+    - Restart apache2
+
+- name: a2dissite 000-default
+  command: a2dissite 000-default
+  notify:
+    - Restart apache2
+
+- name: Enable apache mod_rewrite
+  apache2_module: 
+    state: present
+    name: rewrite 
+  notify:
+    - Restart apache2
+
+# Php
+- name: Install php && dependencies
+  apt:
+    name: "{{ item }}" # Iteration
+    state: present 
+  with_items:
+    - php7.2
+    - php7.2-mysql
+    - php-curl
+    - php-common
+  notify:
+    - Restart apache2
+
+# Vsftpd
+- name: Create FTP user
+  user:
+    name: "{{ vsftpd_user }}"
+    password: "{{ vsftpd_user }}"
+    groups: www-data # Group www-data
+    append: yes # Add to groups 
+    shell: /bin/bash
+
+- name: Install vsftpd
+  apt:
+    name: vsftpd
+    state: present
+    update_cache: yes
+
+- name: Configure vsftpd
+  template: 
+    src: vsftpd.conf.j2 
+    dest: /etc/vsftpd.conf
+  notify: Restart vsftpd
+
+- name: Add authorized user to vsftpd list
+  template:
+    src: vsftpd.allowed_users.j2
+    dest: /etc/vsftpd.allowed_users
+  notify: Restart vsftpd
+

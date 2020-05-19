@@ -1,0 +1,16 @@
+---
+
+# Host
+web_host: 157.245.9.65
+
+# WP database infos
+db_name: wordpress_db
+db_user: my_user
+db_password: password
+db_host: 159.203.77.235
+
+# Path installation
+path: /var/www/wordpress
+
+# Server infos
+server_hostname: ansiblewordpress

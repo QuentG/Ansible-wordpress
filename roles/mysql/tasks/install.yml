@@ -1,0 +1,61 @@
+---
+
+# Install mysql && dependencies
+- name: Mysql - Install libs
+  apt: 
+    pkg: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - python3.6
+    - python-mysqldb
+    - mysql-server
+    - mysql-client
+    - libmysqlclient-dev
+
+- name: Start the MySQL service
+  action: service name=mysql state=started
+
+# Create database
+- name: Create mysql database
+  mysql_db: 
+    name: "{{ db_name }}" 
+
+# Mysql user
+- name: Create mysql user
+  mysql_user: 
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+    priv: "*.*:ALL"
+    host: '%' 
+  notify: 
+    - Restart mysql
+
+- name: Copy database dump
+  template:
+    src: "{{ dump_name }}.sql.j2"
+    dest: /tmp/{{ dump_name }}.sql
+
+- name: Import database dump
+  mysql_db:
+    state: import
+    name: "{{ dump_name }}"
+    target: /tmp/{{ dump_name }}.sql
+
+# Firewall ufw
+- name: Allow all access to tcp port 3306
+  ufw:
+    rule: allow
+    port: '3306'
+    proto: tcp
+
+# Remote connections
+- name: Enable remote connections
+  replace:
+    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+    regexp: "^(bind-address*)"
+    replace: '# \1'
+  notify:
+    - Restart mysql
+
+# YES LA CONNEXION MARCHE <3

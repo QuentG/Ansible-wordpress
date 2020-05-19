@@ -1,0 +1,9 @@
+---
+
+# Apache2
+- name: Restart apache2
+  service: name=apache2 state=restarted
+
+# Vsftpd
+- name: Restart vsftpd
+  service: name=vsftpd state=restarted

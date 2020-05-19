@@ -1,0 +1,9 @@
+---
+
+# Dump database
+dump_name: wp_dump
+
+# Dump info
+wp_username: quentin
+wp_email: quentin.gans@ynov.com
+wp_blogname: Mon blog name
